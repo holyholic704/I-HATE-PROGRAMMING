@@ -785,16 +785,29 @@ int method(final int i) {
 在 JDK1.8 之后可以为接口方法提供一个默认实现，**用 default 修饰符来标记方法**，这样一来就可以只关心需要的方法，而不用去实现不需要的方法
 
 ```java
-public class Demo implements PeopleDo {
-    public static void main(String[] args) {
-        Demo demo = new Demo();
-        demo.say("fuck you");
+interface Animal {
+    // 默认实现
+    default void cao() {
+        System.out.println("animal 艹");
+    }
+
+    void ri();
+}
+
+class Human implements Animal {
+    // 默认方法可以不进行重写，非默认方法必须重写
+    @Override
+    public void ri() {
+        System.out.println("human 日");
     }
 }
 
-interface PeopleDo {
-    default void say(String something) {
-        System.out.println("people say " + something);
+public class Test {
+    public static void main(String[] args) {
+        Human human = new Human();
+        // 不需要重写，直接调用默认方法
+        human.cao();
+        human.ri();
     }
 }
 ```
@@ -806,52 +819,55 @@ interface PeopleDo {
 
 ```java
 // 超类优先
-public class Demo extends EveryoneDo implements PeopleDo {
+interface Animal {
+    default void cao() {
+        System.out.println("animal 艹");
+    }
+}
+
+class Mammal {
+   public void cao() {
+        System.out.println("mammal 艹");
+    }
+}
+
+class Human extends Mammal implements Animal {}
+
+public class Test {
     public static void main(String[] args) {
-        Demo demo = new Demo();
-        // everyone say fuck you
-        // 如果重写say方法，重写的会是EveryoneDo中的方法
-        demo.say("fuck you");
-    }
-}
-
-class EveryoneDo {
-    public void say(String something) {
-        System.out.println("everyone say " + something);
-    }
-}
-
-interface PeopleDo {
-    default void say(String something) {
-        System.out.println("people say " + something);
+        Human human = new Human();
+        human.cao();	// mammal 艹
     }
 }
 ```
 
 ```java
 // 接口冲突
-public class Demo implements PeopleDo,HumanDo {
-    public static void main(String[] args) {
-        Demo demo = new Demo();
-        demo.say("fuck you");
+interface Animal {
+    default void cao() {
+        System.out.println("animal 艹");
     }
+}
 
-    // 必须重写say方法
+interface Mammal {
+    default void cao() {
+        System.out.println("mammal 艹");
+    }
+}
+
+class Human implements Mammal, Animal {
+    // 必须重写默认方法
     @Override
-    public void say(String something) {
-        System.out.println(something + "!!!");
+    public void cao() {
+        System.out.println("human 艹");
     }
 }
 
-interface PeopleDo {
-    default void say(String something) {
-        System.out.println("people say " + something);
+public class Test {
+    public static void main(String[] args) {
+        Human human = new Human();
+        human.cao();
     }
-}
-
-interface HumanDo {
-    // 如果被default修饰，仍要被重写
-    void say(String something);
 }
 ```
 
@@ -893,27 +909,43 @@ public class Block {
 
 ```java
 public class Father {
-    {System.out.println("父类构造代码块");}
+    {
+        System.out.println("父类构造代码块");
+    }
 
-    static {System.out.println("父类静态代码块");}
+    static {
+        System.out.println("父类静态代码块");
+    }
 
     public void method() {
-        {System.out.println("父类普通代码块");}
+        {
+            System.out.println("父类普通代码块");
+        }
 
-        synchronized (this) {System.out.println("父类同步代码块");}
+        synchronized (this) {
+            System.out.println("父类同步代码块");
+        }
     }
 }
 
 public class Son extends Father {
-    {System.out.println("子类构造代码块");}
+    {
+        System.out.println("子类构造代码块");
+    }
 
-    static {System.out.println("子类静态代码块");}
+    static {
+        System.out.println("子类静态代码块");
+    }
 
     @Override
     public void method() {
-        {System.out.println("子类普通代码块");}
+        {
+            System.out.println("子类普通代码块");
+        }
 
-        synchronized (this) {System.out.println("子类同步代码块");}
+        synchronized (this) {
+            System.out.println("子类同步代码块");
+        }
     }
 }
 

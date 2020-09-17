@@ -1,17 +1,150 @@
-## Lambda 表达式
+## 1、Java 8
 
-​		Lambda 表达式是 Java 8 添加的一个新特性，可以认为，Lambda 是一个匿名函数（相似于匿名内部类），作用是返回一个实现了接口的对象
+2014 年 3 月 18 日，Oracle 发布了 Java 8，为目前唯二的 LTS（长期支持）版本之一，另一个是 Java 11，目前最新的版本为 Java 15
 
-- 虽然 Lambda 表达式对某些接口进行简单的实现，但是并不是所有的接口都可以使用 Lambda 表达式来实现，**要求接口中定义的必须要实现的抽象方法只能有一个**
+- Java 8 为目前使用最多的发行版本
+
+![20200917223048](../md.assets/Java/20200917223048.png)
+
+*更多：[Java版本历史](https://zh.wikipedia.org/wiki/Java%E7%89%88%E6%9C%AC%E6%AD%B7%E5%8F%B2)、[Jetbrains Java编程](https://www.jetbrains.com/zh-cn/lp/devecosystem-2020/java/)*
+
+## 2、接口默认实现与静态方法
+
+Java 8 之后可以为接口方法提供一个默认实现，**用 default 修饰符来标记方法**，这样就可以只关心需要的方法，而不用去实现不需要的方法
+
+- 在 JVM 中，接口的默认实现是非常高效的，并且通过字节码指令为方法调用提供了支持
+
+```java
+interface Animal {
+    // 默认实现
+    default void cao() {
+        System.out.println("animal 艹");
+    }
+
+    void ri();
+}
+
+class Human implements Animal {
+    // 默认方法可以不进行重写，非默认方法必须重写
+    @Override
+    public void ri() {
+        System.out.println("human 日");
+    }
+}
+
+public class Test {
+    public static void main(String[] args) {
+        Human human = new Human();
+        // 不需要重写，直接调用默认方法
+        human.cao();
+        human.ri();
+    }
+}
+```
+
+### 2.1  默认方法冲突
+
+如果先在一个接口中将一个方法定义为默认方法，然后又在超类或另一个接口中定义了同样的方法，就会产生冲突
+
+- 超类优先：如果超类提供了一个具体方法，同名而且有相同参数类型的默认方法会被忽略
+- 接口冲突：如果一个超接口提供了一个默认方法，另一个接口提供了一个同名而且参数类型（不论是否是默认参数）相同的方法，必须覆盖这个方法来解决冲突
+
+```java
+// 超类优先
+interface Animal {
+    default void cao() {
+        System.out.println("animal 艹");
+    }
+}
+
+class Mammal {
+   public void cao() {
+        System.out.println("mammal 艹");
+    }
+}
+
+class Human extends Mammal implements Animal {}
+
+public class Test {
+    public static void main(String[] args) {
+        Human human = new Human();
+        human.cao();	// mammal 艹
+    }
+}
+```
+
+```java
+// 接口冲突
+interface Animal {
+    default void cao() {
+        System.out.println("animal 艹");
+    }
+}
+
+interface Mammal {
+    default void cao() {
+        System.out.println("mammal 艹");
+    }
+}
+
+class Human implements Mammal, Animal {
+    // 必须重写默认方法
+    @Override
+    public void cao() {
+        System.out.println("human 艹");
+    }
+}
+
+public class Test {
+    public static void main(String[] args) {
+        Human human = new Human();
+        human.cao();
+    }
+}
+```
+
+### 2.2  接口中的静态方法
+
+```java
+public class Test {
+    public static void main(String[] args) {
+        Animal.cao();
+    }
+}
+
+interface Animal {
+    // 必须要有方法体
+    static void cao() {
+        System.out.println("animal 艹");
+    }
+}
+```
+
+## 3、函数式接口
+
+并不是所有的接口都可以使用 Lambda 表达式来实现，只有函数式接口才能写成 Lambda 表达式
+
+- 函数式接口：**要求接口中定义的必须要实现的抽象方法只能有一个**
 
 ```java
 // 该注解修饰函数式接口，即意味着接口中的抽象方法只能有一个，否则编译器会报错
-// default方法不会造成任何影响，可以出现default方法
-@FunctionalInterface
-public interface Test {
-    void test();
+// default方法和静态方法不会造成任何影响
+interface Animal {
+    void cao();
+    
+    default void ri() {
+        System.out.println("日");
+    }
+
+    static void shit() {
+        System.out.println("shit");
+    }
 }
 ```
+
+## 4、Lambda 表达式
+
+Lambda 表达式是 Java 8 添加的一个新特性，可以认为 Lambda 是一个匿名函数（相似于匿名内部类），作用是返回一个实现了接口的对象
 
 - Lambda 表达式是一个匿名函数，主要关注方法的参数列表和方法体
   - `()`：描述参数列表
