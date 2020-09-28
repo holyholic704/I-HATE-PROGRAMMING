@@ -808,10 +808,11 @@ void linkBefore(E e, Node<E> succ) {
     final Node<E> pred = succ.prev;
     final Node<E> newNode = new Node<>(pred, e, succ);
     succ.prev = newNode;
-    if (pred == null)
+    if (pred == null) {
         first = newNode;
-    else
+    } else {
         pred.next = newNode;
+    }
     size++;
     modCount++;
 }
