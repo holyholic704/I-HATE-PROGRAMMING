@@ -662,7 +662,7 @@ private boolean batchRemove(Collection<?> c, boolean complement) {
 // LinkedList实际大小
 transient int size = 0;
 
-// 头结点
+// 头节点
 transient Node<E> first;
 
 // 尾节点
@@ -697,66 +697,110 @@ public LinkedList(Collection<? extends E> c) {
 
 ### 11.3  添加元素
 
+#### 11.3.1  添加元素到头部或尾部
+
 ```java
+// 添加元素到尾部
 public boolean add(E e) {
     linkLast(e);
     return true;
 }
+
+// 添加元素到头部
+public void addFirst(E e) {
+    linkFirst(e);
+}
+
+// 添加元素到尾部
+public void addLast(E e) {
+    linkLast(e);
+}
+
+// 添加元素到头部
+public void push(E e) {
+    addFirst(e);
+}
+
+// 添加元素到尾部
+public boolean offer(E e) {
+    return add(e);
+}
+
+// 添加元素到头部
+public boolean offerFirst(E e) {
+    addFirst(e);
+    return true;
+}
+
+
+// 添加元素到尾部
+public boolean offerLast(E e) {
+    addLast(e);
+    return true;
+}
+
+// 链接元素到头部
+private void linkFirst(E e) {
+    // 获取头节点
+    final Node<E> f = first;
+    // 新建元素节点，因为添加到头部，所以上个节点指向null
+    final Node<E> newNode = new Node<>(null, e, f);
+    // 将头节点指向新建的节点
+    first = newNode;
+    if (f == null) {
+        // 如果是空链表，则将尾节点也指向新建的节点，头尾都指向同一节点
+        last = newNode;
+    } else {
+        // 将原来的头结点的前节点指向新建的节点
+        f.prev = newNode;
+    }
+    size++;
+    // 继承于AbstractList，记录着集合的修改次数
+    modCount++;
+}
+
+// 链接元素到尾部
+void linkLast(E e) {
+    final Node<E> l = last;
+    final Node<E> newNode = new Node<>(l, e, null);
+    last = newNode;
+    if (l == null) {
+        first = newNode;
+    } else {
+        l.next = newNode;
+    }
+    size++;
+    modCount++;
+}
 ```
 
+#### 11.3.2  添加元素到指定位置
+
 ```java
+// 添加元素到指定位置
 public void add(int index, E element) {
     checkPositionIndex(index);
 
-    if (index == size)
+    if (index == size) {
         linkLast(element);
-    else
-        linkBefore(element, node(index));
-}
-
-Node<E> node(int index) {
-    // assert isElementIndex(index);
-
-    if (index < (size >> 1)) {
-        Node<E> x = first;
-        for (int i = 0; i < index; i++)
-            x = x.next;
-        return x;
     } else {
-        Node<E> x = last;
-        for (int i = size - 1; i > index; i--)
-            x = x.prev;
-        return x;
+        linkBefore(element, node(index));
     }
 }
-```
 
-```java
 private void checkPositionIndex(int index) {
-    if (!isPositionIndex(index))
+    if (!isPositionIndex(index)) {
         throw new IndexOutOfBoundsException(outOfBoundsMsg(index));
+    }
 }
 
 private boolean isPositionIndex(int index) {
     return index >= 0 && index <= size;
 }
 
+// 错误信息
 private String outOfBoundsMsg(int index) {
     return "Index: "+index+", Size: "+size;
-}
-```
-
-```java
-void linkLast(E e) {
-    final Node<E> l = last;
-    final Node<E> newNode = new Node<>(l, e, null);
-    last = newNode;
-    if (l == null)
-        first = newNode;
-    else
-        l.next = newNode;
-    size++;
-    modCount++;
 }
 
 void linkBefore(E e, Node<E> succ) {
@@ -771,58 +815,23 @@ void linkBefore(E e, Node<E> succ) {
     size++;
     modCount++;
 }
-```
 
+Node<E> node(int index) {
+    // assert isElementIndex(index);
 
-
-```java
-public void addFirst(E e) {
-    linkFirst(e);
-}
-
-
-public void addLast(E e) {
-    linkLast(e);
-}
-
-private void linkFirst(E e) {
-    final Node<E> f = first;
-    final Node<E> newNode = new Node<>(null, e, f);
-    first = newNode;
-    if (f == null)
-        last = newNode;
-    else
-        f.prev = newNode;
-    size++;
-    modCount++;
-}
-```
-
-
-
-```java
-public boolean offer(E e) {
-    return add(e);
-}
-
-
-public boolean offerFirst(E e) {
-    addFirst(e);
-    return true;
-}
-
-
-public boolean offerLast(E e) {
-    addLast(e);
-    return true;
-}
-```
-
-
-
-```java
-public void push(E e) {
-    addFirst(e);
+    if (index < (size >> 1)) {
+        Node<E> x = first;
+        for (int i = 0; i < index; i++) {
+            x = x.next;
+        }
+        return x;
+    } else {
+        Node<E> x = last;
+        for (int i = size - 1; i > index; i--) {
+            x = x.prev;
+        }
+        return x;
+    }
 }
 ```
 
