@@ -11,7 +11,7 @@ ArrayList 内部使用 **数组** 进行存储。**初始容量为 10**，该容
 - ArrayList 实现了三个标识接口 `RandomAccess`、`Serializable`、`Cloneable`
   - `RandomAccess`：支持快速随机访问
   - `Serializable`：支持序列化
-  - ``Cloneable`：支持克隆
+  - `Cloneable`：支持克隆
 
 - ArrayList 继承了 `AbstractList` 抽象类，实现了 `List` 接口，提供了添加、删除、修改、遍历等功能
 
@@ -706,7 +706,7 @@ public class Test {
     public static void main(String[] args) {
         List<String> l1 = getArrayList();
         List<String> l2 = getLinkedList();
-        删除传入的集合中的指定元素
+        // 删除传入的集合中的指定元素
         l1.removeAll(l2);
         System.out.println(l1);
 
@@ -890,7 +890,29 @@ public boolean removeIf(Predicate<? super E> filter) {
 }
 ```
 
+```java
+public class Test {
+    public static void main(String[] args) {
+        List<String> list = getArrayList();
+        list.removeIf(l -> l.length() == 1);
+        // 输出空数组
+        System.out.println(list);
+    }
 
+    static List<String> getArrayList() {
+        List<String> list = new ArrayList<>();
+        list.add("a");
+        list.add("b");
+        list.add("c");
+        list.add("d");
+        list.add("e");
+        list.add("f");
+        return list;
+    }
+}
+```
+
+#### 4.5.15  替换
 
 ```java
 @Override
@@ -909,9 +931,30 @@ public void replaceAll(UnaryOperator<E> operator) {
 }
 ```
 
+```java
+public class Test {
+    public static void main(String[] args) {
+        List<String> list = getArrayList();
+        list.replaceAll(l -> "a".equals(l) ? "A" : "B");
+        System.out.println(list);
+    }
 
+    static List<String> getArrayList() {
+        List<String> list = new ArrayList<>();
+        list.add("a");
+        list.add("b");
+        list.add("c");
+        list.add("d");
+        list.add("e");
+        list.add("f");
+        return list;
+    }
+}
+```
 
+> [A, B, B, B, B, B]
 
+#### 4.5.16  排序
 
 ```java
 @Override
@@ -926,7 +969,46 @@ public void sort(Comparator<? super E> c) {
 }
 ```
 
+```java
+public class Test {
+    public static void main(String[] args) {
+        List<String> list = getArrayList();
+        list.sort((l1, l2) -> {
+            int c1 = l1.getBytes()[0];
+            int c2 = l2.getBytes()[0];
+            if (c1 < c2) {
+                return 1;
+            } else if (c1 > c2) {
+                return -1;
+            } else {
+                return 0;
+            }
+        });
 
+        System.out.println(list);
+    }
 
+    static List<String> getArrayList() {
+        List<String> list = new ArrayList<>();
+        list.add("a");
+        list.add("b");
+        list.add("c");
+        list.add("d");
+        list.add("e");
+        list.add("f");
+        return list;
+    }
+}
+```
 
+> [f, e, d, c, b, a, a]
 
+## 5、内部类
+
+![20201002154049](../md.assets/集合/20201002154049.png)
+
+- `SubList` 继承了 `AbstractList` 抽象类，并且实现了 `RandomAccess` 接口，支持快速随机访问，主要用于返回一个截取的 ArrayList 视图
+- `Itr` 实现了 `Iterator` 接口，主要用于顺序向后迭代
+- `ListItr` 继承了 `Itr` 类，并且实现了 `ListIterator` 接口， 可以进行双向迭代，并且可以从指定下标处开始迭代
+- `ArrayListSpliterator` 实现了 `Spliterator` 接口，可以进行并行迭代
+  - `ArrayListSpliterator` 是 4 个内部类中唯一一个静态内部类，并且被 final 修饰，是不可变类
