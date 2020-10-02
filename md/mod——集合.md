@@ -94,21 +94,15 @@ List 接口为 Collection 直接接口，是线性数据结构的主要实现。
 
 ### 5.1  ArrayList
 
-ArrayList 内部使用 **数组** 进行存储。**初始容量为 10**，该容量代表了数组的大小。当容器中的元素不断增加时，集合扩容时会创建更大的数组空间。所以 **最好指定一个初始容量值**，避免过多的进行扩容操作而浪费时间、效率
-
-- ArrayList 擅长于随机访问，但插入和删除时速度通常很慢，因为可能需要移动其他元素
+*更多：[集合——ArrayList](集合——ArrayList.md)*
 
 ### 5.2  LinkedList
 
-LinkedList 本质是 **双向链表**。除了有 ArrayList 的基本操作方法外，还提供了 get，remove，insert 方法操作首部或尾部。LinkedList 包含 3 个重要的成员：**size、first、last**。size 是双向链表中节点的个数，first 和 last 分别指向第一个和最后一个节点的引用。LinkedList 的优点在于 **可以将零散的内存单元通过附加引用的方式关联起来，形成按链路顺序查找的线性结构，内存利用率较高**
-
-- LinkedList 除了继承 AbstractList 抽象类外，LinkedList 还实现了 **Deque 接口**，这个接口 **同时具有队列和栈的性质**
-
-- LinkedList 的插入和删除速度很快，但是随机访问速度则很慢。因为所有的操作都是要按照双重链表的需要执行。**在列表中索引的操作将从开头或结尾遍历列表**（从靠近指定索引的一端）。这样做的好处就是可以通过较低的代价在 List 中进行插入和删除操作
-
-- 与 ArrayList 一样，LinkedList 也是非同步的。如果多个线程同时访问一个 List，则必须自己实现访问同步。一种解决方法是在创建 List 时构造一个同步的 List：`List list = Collections.synchronizedList(new LinkedList(...))`
+*更多：[集合——LinkedList](集合——LinkedList.md)*
 
 ### 5.3  Vector
+
+与 ArrayList 一样，LinkedList 也是非同步的。如果多个线程同时访问一个 List，则必须自己实现访问同步。一种解决方法是在创建 List 时构造一个同步的 List：`List list = Collections.synchronizedList(new LinkedList(...))`
 
 与 ArrayList 相似，但是 Vector 是同步的，即 Vector 是 **线程安全的动态数组**。它的操作与 ArrayList 几乎一样
 

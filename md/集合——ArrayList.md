@@ -354,7 +354,7 @@ private void rangeCheck(int index) {
 
 ```java
 public E set(int index, E element) {
-    // 检查是否越界
+    // 检查传入的下标是否越界
     rangeCheck(index);
 	// 获得旧值，用于返回
     E oldValue = elementData(index);
@@ -392,7 +392,7 @@ public boolean remove(Object o) {
     // 因为ArrayList可以保存null，所以传入的元素为null也可以进行操作
     if (o == null) {
         for (int index = 0; index < size; index++) {
-            // 查找元素为null的下标，传入fastRemove方法，只删除查到的第一个元素
+            // 查找元素为null的下标，调用fastRemove方法，只删除查到的第一个元素
             if (elementData[index] == null) {
                 fastRemove(index);
                 return true;
@@ -400,7 +400,7 @@ public boolean remove(Object o) {
         }
     } else {
         for (int index = 0; index < size; index++) {
-            // 查找元素等于传入元素的下标，传入fastRemove方法，只删除查到的第一个元素
+            // 查找元素等于传入元素的下标，调用fastRemove方法，只删除查到的第一个元素
             if (o.equals(elementData[index])) {
                 fastRemove(index);
                 return true;
@@ -655,7 +655,25 @@ protected void removeRange(int fromIndex, int toIndex) {
 }
 ```
 
-#### 4.5.10  删除或保留指定元素
+#### 4.5.10  克隆
+
+```java
+public Object clone() {
+    try {
+        ArrayList<?> v = (ArrayList<?>) super.clone();
+        // 将元素复制到克隆后的数组中
+        v.elementData = Arrays.copyOf(elementData, size);
+        // 将修改次数设为0
+        v.modCount = 0;
+        return v;
+    } catch (CloneNotSupportedException e) {
+        // this shouldn't happen, since we are Cloneable
+        throw new InternalError(e);
+    }
+}
+```
+
+#### 4.5.11  删除或保留指定元素
 
 ```java
 // 删除传入的集合中的指定元素
@@ -673,9 +691,14 @@ public boolean retainAll(Collection<?> c) {
 private boolean batchRemove(Collection<?> c, boolean complement) {
     final Object[] elementData = this.elementData;
     int r = 0, w = 0;
+    // 是否修改成功
     boolean modified = false;
     try {
+        // 遍历elementData数组
         for (; r < size; r++) {
+            // 判断传入的集合中是否包括数组中的元素，contains判断为true时，表示包含该元素
+            // complement为false时，保存未出现过的元素，即删除指定元素
+            // complement为true时，保存出现过的元素，即保留指定元素
             if (c.contains(elementData[r]) == complement) {
                 elementData[w++] = elementData[r];
             }
@@ -683,15 +706,19 @@ private boolean batchRemove(Collection<?> c, boolean complement) {
     } finally {
         // Preserve behavioral compatibility with AbstractCollection,
         // even if c.contains() throws.
+        // 如果发生异常，会出现r不等于size
         if (r != size) {
             System.arraycopy(elementData, r, elementData, w, size - r);
             w += size - r;
         }
+        
         if (w != size) {
             // clear to let GC do its work
+            // 将新存入元素之后的所有元素都指向null
             for (int i = w; i < size; i++) {
                 elementData[i] = null;
             }
+            // 修改次数
             modCount += size - w;
             size = w;
             modified = true;
@@ -739,7 +766,7 @@ public class Test {
 > [b, c, e, f]
 > [a, d]
 
-#### 4.5.11 迭代器
+#### 4.5.12 迭代器
 
 ```java
 // 从指定下标处开始迭代
@@ -777,7 +804,7 @@ public Spliterator<E> spliterator() {
 |      可以删除元素      | 可以删除元素 |
 |      可以修改元素      |     不能     |
 
-#### 4.5.12 返回 ArrayList 的部分视图
+#### 4.5.13 返回 ArrayList 的部分视图
 
 ```java
 public List<E> subList(int fromIndex, int toIndex) {
@@ -824,7 +851,7 @@ public class ArrayList2Test {
 
 > [c, d, e]
 
-#### 4.5.13  遍历
+#### 4.5.14  遍历
 
 ```java
 @Override
@@ -843,7 +870,7 @@ public void forEach(Consumer<? super E> action) {
 }
 ```
 
-#### 4.5.14  根据规则过滤集合中的元素
+#### 4.5.15  根据规则过滤集合中的元素
 
 ```java
 @Override
@@ -912,7 +939,7 @@ public class Test {
 }
 ```
 
-#### 4.5.15  替换
+#### 4.5.16  替换
 
 ```java
 @Override
@@ -954,7 +981,7 @@ public class Test {
 
 > [A, B, B, B, B, B]
 
-#### 4.5.16  排序
+#### 4.5.17  排序
 
 ```java
 @Override
